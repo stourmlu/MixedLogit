@@ -1,0 +1,135 @@
+\documentclass[12pt]{article}
+
+\usepackage[titletoc]{appendix}
+
+\usepackage{setspace}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{bbm}
+
+\usepackage[margin=1in]{geometry}
+
+\title{Bertrand-Nash equilibria under mixed logit demand}
+\author{Ludovic Stourm}
+
+\begin{document}
+\maketitle
+
+This document describes how to infer firm marginal costs from observed prices and demand, and how to compute counterfactual equilibrium prices. We assume a mixed logit model of demand, and Bertrand price competition between firms.
+
+\section{Setup}
+\subsection{General setup}
+There are $F$ firms and $J$ goods. Each firm $f$ produces a subset $\mathcal{J}_f$ of the goods and sets the corresponding prices in a way that maximizes its profit $\Pi_f$:
+\begin{equation}
+	\underset{\{p_j\}_{j \in \mathcal{J}_f}}{\max} \Pi_f = \sum_{j \in \mathcal{J}_f} D_j(\textbf{p}) \times (p_j -mc_j) - C_f
+\end{equation}
+where:
+\begin{itemize}
+	\setlength\itemsep{0pt}
+	\item $p_j$ is the price of good $j$
+	\item $\textbf{p}$ is a $(J \times 1)$ vector that collects the prices of all goods
+	\item $D_j(\textbf{p})$ is the demand for good $j$ as a function of all prices
+	\item $mc_j$ is the marginal cost of good $j$ (incurred by the corresponding firm $f$)
+	\item $C_f$ is firm $f$'s fixed costs.
+\end{itemize}
+
+\subsection{First-order conditions}
+Let us denote by $\tilde{f}(j)$ the firm that produces good $j$. In a Bertrand-Nash equilibrium (where firms set their prices to maximize their profit), we have a first-order condition for each $j$:
+\begin{equation}
+	\frac{\partial \Pi_{\tilde{f}(j)}}{\partial p_j} = 0 \implies D_j(\textbf{p}) + \sum_{k\in \mathcal{J}_{\tilde{f}(j)}} (p_k - mc_k) \frac{\partial D_k(\textbf{p})}{\partial p_j} = 0
+\end{equation}
+where $\mathcal{J}_{\tilde{f}(j)}$ is the set of all products that are produced by the same firm as product $j$ (including $j$ itself).
+For convenience, we define a ($J \times J$) matrix $\Omega$ such that:
+\begin{equation}
+	\Omega_{jk}(\textbf{p}) =  \left\{ \begin{aligned}
+		& \frac{- \partial D_k(\textbf{p})}{\partial p_j} && \text{ if } \tilde{f}(j) = \tilde{f}(k) \hspace*{5pt} \text{ ($j$ and $k$ are produced by the same firm)} \\
+		& 0 && \text{ otherwise}
+	\end{aligned} \right.
+\label{eq:omega}
+\end{equation}
+Then the set of first-order conditions can be written in matrix form as follows:
+\begin{equation}
+	\textbf{D}(\textbf{p}) = \Omega(\textbf{p}) (\textbf{p} - \textbf{mc}) \iff \textbf{p} - \textbf{mc} = \left[\Omega(\textbf{p})\right]^{-1} \textbf{D}(\textbf{p})
+\label{eq:FOC}
+\end{equation}
+where
+\begin{itemize}
+	\setlength\itemsep{0pt}
+	\item $\textbf{D}(\textbf{p})$ is a $(J \times 1)$ vector that collects the demands $D_{j}(\textbf{p})$ across all goods $j$
+	\item $\textbf{mc}$ is a $(J \times 1)$ vector that collects the marginal costs $mc_{j}$ across all goods $j$
+\end{itemize}
+
+\subsection{Second-order conditions}
+For each firm $f$, the matrix $\textbf{H}^{(f)}$ of second-degree derivatives of profit with respect to own prices must be negative-definite:
+\begin{equation}
+\begin{aligned}
+	\textbf{H}^{(f)}_{jk} = \frac{\partial^2 \Pi_f}{\partial p_j \partial p_k} = \frac{\partial D_j(\textbf{p})}{\partial p_k} + \frac{\partial D_k(\textbf{p})}{\partial p_j} + \sum_{l} (p_l - mc_l) \frac{\partial^2 D_l(\textbf{p})}{\partial p_j \partial p_k }
+\end{aligned}
+\label{eq:SOC}
+\end{equation}
+
+\section{The case of Mixed Multinomial Logit Demand}
+
+\subsection{Demand function}
+The demand comes from consumer types, denoted by subscript $i$; the size of type $i$ is denoted by $\psi_i$. Each consumer belongs to a type and chooses among the $J$ goods, and an outside option, according to a multinomial logit model:
+\begin{equation}
+\begin{aligned}
+	& D_j(\textbf{p}) && = \sum_i \psi_i {D_j^{(i)}(\textbf{p})} \\
+	\text{where} \hspace*{5pt} & {D_j^{(i)}(\textbf{p})} && = \frac{e^{ \tilde{V}_{ij}+ \beta_i p_j}}{1 + \sum_k e^{ \tilde{V}_{ik} + \beta_i p_k}}
+\end{aligned}
+\label{eq:demand}
+\end{equation}
+Here, $V_{ij}$ corresponds to the ``non-price" utility of product $j$ for type $i$, and $\beta_i$ is the price coefficient of consumers in type $i$. The utility of the outside option is normalized to 0. \\
+\\
+The first-order derivatives of demand with respect to prices are given by:
+\begin{equation}
+	\frac{\partial D_j(\textbf{p})}{\partial p_k} = \sum_i \psi_i \beta_i \times D_j^{(i)}(\textbf{p}) \times \left[ \mathbbm{1}\{j=k\} - D_k^{(i)}(\textbf{p}) \right]
+ \label{eq:demand_1st_deriv}
+\end{equation}
+\\
+The second-order derivatives of demand with respect to prices are given by:
+\begin{equation}
+\small
+	\frac{\partial^2 D_{l}(\textbf{p})}{\partial p_j \partial p_k} = \sum_i \psi_i \beta_i^2 D^{(i)}_{l}(\textbf{p}) \left[ \left( \mathbbm{1}\left\{ l = j \right\} - D^{(i)}_j(\textbf{p}) \right) \left( \mathbbm{1}\left\{ l = k \right\} - D^{(i)}_k(\textbf{p}) \right) - D^{(i)}_j(\textbf{p}) \left( \mathbbm{1}\left\{ j = k \right\} - D^{(i)}_k(\textbf{p}) \right)  \right]
+\label{eq:demand_2nd_derivs}
+\end{equation}
+
+\subsection{Inferring marginal costs from observed demand}
+After estimating the mixed multinomial logit model of demand, we can recover the firms' marginal costs if we assume that the prices were set optimally (\textit{i.e.}, observed prices $\textbf{p}$ are the outcome of a Bertrand-Nash equilibrium). To do this, we use the first-order conditions laid out in Equation \ref{eq:FOC}:
+\begin{equation}
+	\textbf{mc} = \textbf{p} - \left[\Omega(\textbf{p})\right]^{-1} \textbf{D}(\textbf{p})
+\end{equation}
+where $\Omega$ is defined in Equations \ref{eq:omega} and \ref{eq:demand_1st_deriv}, and $\textbf{D}(\textbf{p})$ is defined in Equation \ref{eq:demand}.\\
+\\
+It is important to note that that the first-order conditions are necessary but not sufficient, and one should also check the second-order conditions (see Section \ref{ssec:check_price_eq}). If they are not satisfied, it means that the observed prices cannot be the outcome of a Bertrand-Nash equilibrium under the assumed demand model.
+
+\subsection{Computing price equilibrium given demand and marginal costs}
+After recovering marginal costs, it may be interesting to perform counterfactual analyses to simulate market outcomes in alternative scenarios. Then, we need to compute price equilibria in these alternative scenarios, taking marginal costs $\textbf{mc}$ and non-price utilities $\tilde{V}_{ij}$ as given.\\
+\\
+To do the computation efficiently, it is useful to follow the approach by Morrow and Skerlos (2011), which leverages the specific properties of the Mixed Logit model. We start by decomposing $\Omega(\textbf{p})$ as the sum of a diagonal matrix $\Lambda(\textbf{p})$ and another matrix $\Gamma(\textbf{p})$:
+\begin{equation}
+\begin{aligned}
+	& \Omega(\textbf{p}) && = \Lambda(\textbf{p}) + \Gamma(\textbf{p}) \\
+\text{where: } \hspace*{5pt} & \Lambda_{jj}(\textbf{p}) && = - \sum_i \psi_i \beta_i D_j^{(i)}(\textbf{p}) \hspace*{5pt} \text{for all} \hspace*{5pt} j , \hspace*{25pt} \Lambda_{jk}(\textbf{p}) = 0 \hspace*{5pt} \text{if} \hspace*{5pt} j \ne k \\
+					 & \Gamma_{jk}(\textbf{p}) && = \mathbbm{1}\left\{ \tilde{f}(j) = \tilde{f}(k)\right\} \sum_i \psi_i \beta_i D_j^{(i)}(\textbf{p}) D_k^{(i)}(\textbf{p})
+\end{aligned}
+\end{equation}
+Then, we rewrite the first-order conditions as follows:
+\begin{equation}
+\begin{aligned}
+	& \textbf{D}(\textbf{p}) && = \left[ \Lambda(\textbf{p}) + \Gamma(\textbf{p}) \right] \left[\textbf{p} - \textbf{mc}\right] \\
+	\implies	& \Lambda(\textbf{p}) \left[\textbf{p} - \textbf{mc}\right] && = \textbf{D}(\textbf{p}) - \Gamma(\textbf{p}) \left[\textbf{p} - \textbf{mc}\right] \\
+	\implies	& \textbf{p} && = \textbf{mc} +  \left[\Lambda(\textbf{p})\right]^{-1} \left[ \textbf{D}(\textbf{p}) - \Gamma(\textbf{p}) (\textbf{p} - \textbf{mc}) \right] \\
+\end{aligned}
+\end{equation}
+Taking advantage of this property implied by the first-order conditions, we find equilibrium prices by iterating the following step until convergence:
+\begin{equation}
+	\textbf{p}^{(t+1)} \leftarrow \textbf{mc} + \left[ \Lambda \left(\textbf{p}^{(t)} \right) \right]^{-1} \left[ \textbf{D}\left(\textbf{p}^{(t)} \right) - \Gamma\left(\textbf{p}^{(t)}\right) \left( \textbf{p}^{(t)} - \textbf{mc} \right) \right]
+\end{equation}
+Again, the first-order conditions are necessary but not sufficient, and one should also check the second-order conditions (see Section \ref{ssec:check_price_eq}).
+
+\subsection{Checking whether a price is an equilibrium}\label{ssec:check_price_eq}
+It is pretty much impossible to ensure that a vector of prices corresponds to a Bertrand-Nash equilibrium, as it would require to check that the prices set by each firm are a \textit{global} optimum. However, we can easily check that they are a \textit{local} optimum. To do this, we check that the first-order conditions and the second-order conditions, based on Equations \ref{eq:SOC} and \ref{eq:demand_2nd_derivs}.
+
+\end{document}
+
