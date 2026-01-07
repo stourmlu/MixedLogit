@@ -1,0 +1,58 @@
+\documentclass[12pt]{article}
+
+\usepackage[titletoc]{appendix}
+
+\usepackage{setspace}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{bbm}
+\usepackage{multicol}
+
+\usepackage[margin=1in]{geometry}
+
+\title{Mixed logit model}
+\author{Ludovic Stourm}
+
+\begin{document}
+\maketitle
+
+\section{Non-spatial model setup}
+In a market $m$, there are $N_m$ decision-makers drawn from a population characterized by a heterogeneity distribution $f$. There are $J$ alternatives (indexed by $j$), each one is defined by a vector of characteristics $\textbf{x}_{mj}$, which are collected together in a matrix $\textbf{X}_m$. Each consumer chooses between alternatives according to a multinomial logit model. We denote by $y_{mj}$ the number of decision-makers who choose option $j$, and we collect these outcomes in a vector $\textbf{Y}_m$. Mathematically:
+\begin{equation}
+\begin{aligned}
+	& \textbf{Y}_m && \sim Multinomial(N_m, \textbf{p}_m) \\
+	& p_{mj} && = \int_{\omega_r} \tilde{s}_{j}(\textbf{X}_m; \omega_r) f(\omega_r) d \omega_r   \hspace*{5pt} \text{for all } j \\
+	& \tilde{s}_{j}(\textbf{X}_m; \omega_r)  && =  \exp[V(\textbf{x}_{mj}, \omega_r)] \Big/ \sum_k \exp[V(\textbf{x}_{mk}, \omega_r)] \hspace*{5pt} \text{for all } j
+\end{aligned}
+\end{equation}
+where $p_{mj}$ denotes the unconditional probability that a decision-maker (drawn at random from distribution $f$) will choose alternative $j$, and $V(\textbf{x}_{mj}, \omega_r)$ denotes the utility derived by the decision-maker as a function of the characteristics of the alternative chosen and the tastes of the decision-maker.
+
+
+\section{Case of a linear utility with unobserved shocks $\xi$}
+In that case:
+\begin{equation}
+\begin{aligned}
+	& V(X_{mj}, \omega_r) && = \textbf{x}_{mj} \cdot \omega_r + \xi_{mj} \hspace*{20pt} \text{for all } j \\
+\end{aligned}
+\end{equation}
+
+\subsubsection{Case of large $N_m$}
+If $N_m$ is (sufficiently) large, the observed shares are approximately equal to the theoretical shares:
+\begin{equation}
+	\hat{p}_{mj} \approx p_{mj} \hspace*{30pt} \text{where } \hat{p}_{mj} = \frac{y_{mj}}{N_m}
+\end{equation}
+Under this approximation, and assuming moment conditions on the shocks $\xi$, the parameters of the model can be estimated by GMM. There are different approaches, including a nested fixed point algorithm (Berry 1994), and the MPEC approach (Dubé et al. 2012).
+
+
+
+\section{Case of a linear utility without unobserved shocks}
+In that case:
+\begin{equation}
+\begin{aligned}
+	& V(X_{mj}, \omega_r) && = \textbf{x}_{mj} \cdot \omega_r \hspace*{20pt} \text{for all } j \\
+\end{aligned}
+\end{equation}
+We can write down the likelihood function and estimate the model by maximum likelihood.
+
+\end{document}
+
