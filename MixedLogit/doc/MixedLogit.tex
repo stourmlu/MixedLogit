@@ -72,10 +72,10 @@ Some of the elements of $\omega_r$ may be homogenous and others are heterogenous
 	& p_{mj} && = \sum_r \pi_r \frac{e^{V_{mjr}}}{\sum_k e^{V_{mkr}}} \\
 	& V_{mjr} && = \textbf{x}_{mj} \cdot \omega_r \\
 	& && = \textbf{x}^{(1)}_{mj} \cdot \beta + \textbf{x}^{(2)}_{mj} \cdot \gamma_r  \\
-	& && = \left[ \textbf{x}^{(1)}_{mj} ,   \textbf{x}^{(2)}_{mj} \times \mathbbm{1}\{r = 1\} , ... ,  \textbf{x}^{(2)}_{mj} \times \mathbbm{1}\{r = R\} \right] \cdot \left[ \beta ; \gamma_1; ... \gamma_R \right]  \\
-	& && = \tilde{\textbf{x}}_{mjr} \cdot \tilde{\omega}  \\
-\text{where } \hspace*{5pt} & \tilde{\textbf{x}}_{mjr} && = \left[ \textbf{x}^{(1)}_{mj} ,   \textbf{x}^{(2)}_{mj} \times \mathbbm{1}\{r = 1\} , ... ,  \textbf{x}^{(2)}_{mj} \times \mathbbm{1}\{r = R\} \right] \\
-\text{and } \hspace*{5pt} & \tilde{\omega} && = \left[ \beta ; \gamma_1; ... \gamma_R \right] \\
+	& && = \textbf{x}^{(1)}_{mj} \cdot \beta + \left[ \textbf{x}^{(2)}_{mj} \times \mathbbm{1}\{r = 1\} , ... ,  \textbf{x}^{(2)}_{mj} \times \mathbbm{1}\{r = R\} \right] \cdot \left[ \gamma_1; ... \gamma_R \right]  \\
+	& && = \textbf{x}^{(1)}_{mj} \cdot \beta  + \tilde{\textbf{x}}^{(2)}_{mjr} \cdot \tilde{\gamma}  \\
+\text{where } \hspace*{5pt} & \tilde{\textbf{x}}^{(2)}_{mjr} && = \left[ \textbf{x}^{(2)}_{mj} \times \mathbbm{1}\{r = 1\} , ... ,  \textbf{x}^{(2)}_{mj} \times \mathbbm{1}\{r = R\} \right] \\
+\text{and } \hspace*{5pt} & \tilde{\gamma} && = \left[ \gamma_1; ... \gamma_R \right] \\
 \end{aligned}
 \end{equation}
 \underline{Note 1:} For identification, it may be necessary to set some of the coefficients $\gamma_r$ to zero. \\
@@ -102,13 +102,45 @@ If we assume $\Sigma$ to be diagonal with diagonal elements denoted by $\sigma^2
 	\text{where } & \nu_r && = \left[ \nu_{r1},  \nu_{r2}, ...,  \nu_{rL} \right]'  \sim MVN(0, I)
 \end{aligned}
 \end{equation}
+\underline{Note:} One constraint is that we must have $\sigma_l > 0$ for all $l$. Since the integral will be evaluated numerically by taking a number of ``draws" of $\nu_r$, the same likelihood should be obtained by $\sigma_l$ and $(-\sigma_l)$ if these draws are symmetric.
+\\
+\\
 Together:
 \begin{equation}
 \begin{aligned}
-	& V(\textbf{x}_{mj}, \nu_r) && = \textbf{x}_{mj} \cdot \tilde{\beta} + \sum_{l=1}^L \sigma_l \textbf{x}^{(2)}_{mjl} \cdot \nu_{rl} \\
-	\text{where } & \tilde{\beta} && = \left[\beta,  \bar{\gamma} \right]'
+	& V(\textbf{x}_{mj}, \nu_r) && = \textbf{x}^{(1)}_{mj} \cdot \beta + \textbf{x}^{(2)}_{mj} \cdot \bar{\gamma} + \sum_{l=1}^L \sigma_l \textbf{x}^{(2)}_{mjl} \cdot \nu_{rl} \\
+	&  && = \boxed{ \tilde{\textbf{x}}^{(1)}_{mj} \cdot \tilde{\beta} + \tilde{\textbf{x}}^{(2)}_{mjr} \cdot \sigma } \\
+	\text{where } \hspace*{5pt} & \tilde{\textbf{x}}^{(1)}_{mj} && = \left[ \textbf{x}^{(1)}_{mj},  \textbf{x}^{(2)}_{mj} \right] = \textbf{x}_{mj} \\
+	\text{ } & \tilde{\beta} && = \left[\beta,  \bar{\gamma} \right]' \\
+	& \tilde{\textbf{x}}^{(2)}_{mjr} && = \left[ \textbf{x}^{(2)}_{mj1}  \nu_{r1} , ..., \textbf{x}^{(2)}_{mjL}  \nu_{rL}  \right] \\
+	\text{ } & \sigma && = \left[\sigma_1, ..., \sigma_L \right]' \\
 \end{aligned}
 \end{equation}
+
+\paragraph{Approximate integration: \\}
+To evaluate the unconditional probabilities $p_{mj}$, we take draws of $\nu_r$ with corresponding weights $w_r$ (using either quadrature or Monte Carlo integration):
+\begin{equation}
+\begin{aligned}
+	& p_{mj} && \approx \sum_r w_r  \tilde{p}_{mjr} \\
+	\text{where} \hspace*{5pt} & \tilde{p}_{mjr} && =  \frac{\exp[V_{mjr}]}{ \sum_k \exp[V_{mkr}]} \\
+	\text{and} \hspace*{5pt} & V_{mjr} && = V(\textbf{x}_{mj}, \nu_r) = \tilde{\textbf{x}}^{(1)}_{mj} \cdot \tilde{\beta} + \tilde{\textbf{x}}^{(2)}_{mjr} \cdot \sigma \\
+\end{aligned}
+\end{equation}
+
+\paragraph{Log-likelihood and derivatives: \\}
+\begin{equation}
+\begin{aligned}
+	& LL && = \sum_m \sum_{j} y_{mj} \log(p_{mj}) + C \hspace*{15pt}  \text{where } \hspace*{5pt} C =\sum_m \left[ \log(N_m!) - \sum_{j=0}^J \log(y_{mj}!) \right] \\
+	& \frac{\partial LL}{\partial \tilde{\beta}_a} && = \sum_m \sum_{j} y_{mj} \frac{\partial \log(p_{mj})}{\partial \tilde{\beta}} = \sum_m \sum_{j} y_{mj} \left[ X_{mja}^{(1)} - \frac{1}{p_{mj}} \sum_k X_{mka}^{(1)} \sum_r w_r \tilde{p}_{mjr} \tilde{p}_{mkr} \right] \\
+	& \frac{\partial LL}{\partial \sigma_l} && = \sum_m \sum_{j} y_{mj} \frac{\partial \log(p_{mj})}{\partial \sigma_l} = \sum_m \sum_{j} \frac{y_{mj}}{p_{mj}} \sum_r w_r \tilde{p}_{mjr} \left[ X_{mjrl}^{(2)} - \sum_k \tilde{p}_{mkr} X_{mkrl}^{(2)} \right] \\
+	& \frac{\partial^2 LL}{\partial \tilde{\beta}_a \partial \tilde{\beta}_{a'}} && = \sum_m \sum_{j} y_{mj} \frac{\partial^2 \log(p_{mj})}{\partial \tilde{\beta}_a \partial \tilde{\beta}_{a'}} = xxx \\ % TO DO
+	& \frac{\partial^2 LL}{\partial \tilde{\beta}_a \partial \sigma_l} && = \sum_m \sum_{j} y_{mj} \frac{\partial^2 \log(p_{mj})}{\partial \tilde{\beta}_a \partial \sigma_l} = xxx \\ % TO DO
+	& \frac{\partial^2 LL}{\partial \sigma_l \partial \sigma_{l'}} && = \sum_m \sum_{j} y_{mj} \frac{\partial^2 \log(p_{mj})}{\partial \sigma_l \partial \sigma_{l'}} = xxx \\ % TO DO
+\end{aligned}
+\end{equation}
+
+
+
 
 \end{document}
 
