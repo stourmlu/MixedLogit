@@ -52,10 +52,27 @@ function [LL, varargout] = loglikelihood_MMNL(Y, Xhomo, Xhetero, weights, M, M_r
 	if nargout <= 1; return; end;
 	
 	%%% Compute p
-	p = exp(logp);
+	p = exp(logp); % Num_jm x 1
 	
 	%%% Compute grad
-	error('Need to compute grad');
+	error('This code needs to be written properly.')
+	tmp1 = weights' .* p_Tilda./p; % Num_jm x NumDraws
+	tmp1 = reshape(tmp1, [Num_jm*NumDraws 1]); % (Num_jm*NumDraws) x 1
+	tmp2 = zeros(Num_jm, NumXhomo); % Num_jm x NumXhomo
+	p_Tilda = reshape(p_Tilda, [Num_jm*NumDraws 1]);
+	for xx = 1:NumXhomo
+		z1 = accumarray(jmd_2_md_vec, reshape(p_Tilda.*Xhomo(:,xx), [Num_jm*NumDraws 1]), [NumMarkets*NumDraws 1]); % (NumMarkets*NumDraws) x 1
+		z2 = reshape(tmp1 .* z1(jmd_2_md_vec), [Num_jm NumDraws]); % Num_jm x NumDraws)
+		tmp2(:,xx) =  sum(z2, 2); % Num_jm x 1
+	end
+	d_logp_dbeta = Xhomo - tmp2;
+	
+	d_logp_dsigma = xxx; % TO DO
+	
+	dLL_dbeta = Y' * d_logp_dbeta;  % 1 x NumXhomo
+	dLL_sigma = Y' * d_logp_dsigma; % 1 x NumXhetero
+	grad = [dLL_dbeta dLL_sigma]'; % (NumXhomo + NumXhetero) x 1
+	
 	if returnNegative
 		grad = - grad;
 	end
