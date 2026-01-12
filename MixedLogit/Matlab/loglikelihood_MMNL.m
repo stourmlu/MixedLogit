@@ -1,4 +1,4 @@
-function [LL, varargout] = loglikelihood_MMNL(Y, Xhomo, Xhetero, weights, M, M_rep, jmd_2_md_vec, params_val, LL_constant, returnNegative)
+function [LL, varargout] = loglikelihood_MMNL(Y, Xhomo, Xhetero, weights, M, M_rep, jmd_2_md_vec, jmd_2_jm_vec, params_val, LL_constant, returnNegative)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% This function computes the loglikelihood, its gradient and its Hessian for a Multinomial logit model.
 	%
@@ -12,6 +12,7 @@ function [LL, varargout] = loglikelihood_MMNL(Y, Xhomo, Xhetero, weights, M, M_r
 	% M:					NumMarkets x 1
 	% M_rep:				Num_jm x 1
 	% jmd_2_md_vec:			Num_jm*NumDraws x 1 (integers between 1 and NumMarkets*NumDraws)
+	% jmd_2_jm_vec:			Num_jm*NumDraws x 1 (integers between 1 and Num_jm)
 	% params_val:			(NumXhomo + NumXhetero) x 1
 	% LL_constant:			scalar
 	% returnNegative:		boolean
@@ -42,6 +43,7 @@ function [LL, varargout] = loglikelihood_MMNL(Y, Xhomo, Xhetero, weights, M, M_r
 	p_Tilda = reshape(exp(log_pTilda), [Num_jm, NumDraws]); % Num_jm x NumDraws
 	
 	logp = log(p_Tilda * weights); % Num_jm x 1
+	logp = max(logp, -1e300); % This avoids issues of logp -Inf, which subsequently leads to LL = NaN.
 	
 	%%% Compute LL
 	LL = Y'*logp + LL_constant; % scalar
@@ -55,19 +57,24 @@ function [LL, varargout] = loglikelihood_MMNL(Y, Xhomo, Xhetero, weights, M, M_r
 	p = exp(logp); % Num_jm x 1
 	
 	%%% Compute grad
-	error('This code needs to be written properly.')
 	tmp1 = weights' .* p_Tilda./p; % Num_jm x NumDraws
 	tmp1 = reshape(tmp1, [Num_jm*NumDraws 1]); % (Num_jm*NumDraws) x 1
-	tmp2 = zeros(Num_jm, NumXhomo); % Num_jm x NumXhomo
+	d_logp_dbeta = zeros(Num_jm, NumXhomo); % Num_jm x NumXhomo
 	p_Tilda = reshape(p_Tilda, [Num_jm*NumDraws 1]);
 	for xx = 1:NumXhomo
-		z1 = accumarray(jmd_2_md_vec, reshape(p_Tilda.*Xhomo(:,xx), [Num_jm*NumDraws 1]), [NumMarkets*NumDraws 1]); % (NumMarkets*NumDraws) x 1
-		z2 = reshape(tmp1 .* z1(jmd_2_md_vec), [Num_jm NumDraws]); % Num_jm x NumDraws)
-		tmp2(:,xx) =  sum(z2, 2); % Num_jm x 1
+		z1 = accumarray(jmd_2_md_vec, reshape(p_Tilda.*Xhomo(jmd_2_jm_vec,xx), [Num_jm*NumDraws 1]), [NumMarkets*NumDraws 1]); % (NumMarkets*NumDraws) x 1
+		z2 = reshape(tmp1 .* z1(jmd_2_md_vec), [Num_jm NumDraws]); % Num_jm x NumDraws
+		d_logp_dbeta(:,xx) =  - sum(z2, 2); % Num_jm x 1
 	end
-	d_logp_dbeta = Xhomo - tmp2;
+	d_logp_dbeta = d_logp_dbeta + Xhomo; % Num_jm x NumXhomo
+	clear z1 z2;
 	
-	d_logp_dsigma = xxx; % TO DO
+	d_logp_dsigma = zeros(Num_jm, NumXhetero); % Num_jm x NumXhetero
+	for xx = 1:NumXhetero
+		z1 = accumarray(jmd_2_md_vec, p_Tilda.*Xhetero(:,xx), [NumMarkets*NumDraws 1]); % (NumMarkets*NumDraws) x 1
+		z2 = reshape(tmp1.*(Xhetero(:,xx) - z1(jmd_2_md_vec)), [Num_jm NumDraws]); % Num_jm x NumDraws
+		d_logp_dsigma(:,xx) = sum(z2, 2); % Num_jm x 1
+	end
 	
 	dLL_dbeta = Y' * d_logp_dbeta;  % 1 x NumXhomo
 	dLL_sigma = Y' * d_logp_dsigma; % 1 x NumXhetero
