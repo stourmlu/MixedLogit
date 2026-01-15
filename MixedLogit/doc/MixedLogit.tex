@@ -81,9 +81,6 @@ Some of the elements of $\omega_r$ may be homogenous and others are heterogenous
 \underline{Note 1:} For identification, it may be necessary to set some of the coefficients $\gamma_r$ to zero. \\
 \underline{Note 2:} To prevent label-switching problems, it is a good idea to sort latent classes by decreasing size $\pi_r$. \\
 
-% TO DO: derive expressions useful to compute the first and second-order derivatives of LL with respect to $\beta, \gamma_r$, and $\pi_r$, and discussion transformation of $\pi$ to enforce constraint that the sizes sum up to one.
-
-
 
 \subsection{Case of multivariate Normal distribution of heterogeneity}
 Some of the elements of $\omega_r$ may be homogenous and others are heterogenous. We can write:
@@ -127,19 +124,74 @@ To evaluate the unconditional probabilities $p_{mj}$, we take draws of $\nu_r$ w
 \end{aligned}
 \end{equation}
 
-\paragraph{Log-likelihood and derivatives: \\}
+\paragraph{Useful derivatives: \\}
 \begin{equation}
+\small
 \begin{aligned}
-	& LL && = \sum_m \sum_{j} y_{mj} \log(p_{mj}) + C \hspace*{15pt}  \text{where } \hspace*{5pt} C =\sum_m \left[ \log(N_m!) - \sum_{j=0}^J \log(y_{mj}!) \right] \\
-	& \frac{\partial LL}{\partial \tilde{\beta}_a} && = \sum_m \sum_{j} y_{mj} \frac{\partial \log(p_{mj})}{\partial \tilde{\beta}} = \sum_m \sum_{j} y_{mj} \left[ X_{mja}^{(1)} - \frac{1}{p_{mj}} \sum_k X_{mka}^{(1)} \sum_r w_r \tilde{p}_{mjr} \tilde{p}_{mkr} \right] \\
-	& \frac{\partial LL}{\partial \sigma_l} && = \sum_m \sum_{j} y_{mj} \frac{\partial \log(p_{mj})}{\partial \sigma_l} = \sum_m \sum_{j} \frac{y_{mj}}{p_{mj}} \sum_r w_r \tilde{p}_{mjr} \left[ X_{mjrl}^{(2)} - \sum_k \tilde{p}_{mkr} X_{mkrl}^{(2)} \right] \\
-	& \frac{\partial^2 LL}{\partial \tilde{\beta}_a \partial \tilde{\beta}_{a'}} && = \sum_m \sum_{j} y_{mj} \frac{\partial^2 \log(p_{mj})}{\partial \tilde{\beta}_a \partial \tilde{\beta}_{a'}} = xxx \\ % TO DO
-	& \frac{\partial^2 LL}{\partial \tilde{\beta}_a \partial \sigma_l} && = \sum_m \sum_{j} y_{mj} \frac{\partial^2 \log(p_{mj})}{\partial \tilde{\beta}_a \partial \sigma_l} = xxx \\ % TO DO
-	& \frac{\partial^2 LL}{\partial \sigma_l \partial \sigma_{l'}} && = \sum_m \sum_{j} y_{mj} \frac{\partial^2 \log(p_{mj})}{\partial \sigma_l \partial \sigma_{l'}} = xxx \\ % TO DO
+	& \frac{\partial \tilde{p}_{mjr}}{\partial \tilde{\beta}_a} && =  \tilde{p}_{mjr} \left[ X_{mja}^{(1)} - \sum_k \tilde{p}_{mkr} X_{mka}^{(1)}  \right] \\
+	& \frac{\partial \tilde{p}_{mjr}}{\partial \sigma_l} && =  \tilde{p}_{mjr} \left[ X_{mjrl}^{(2)} - \sum_k \tilde{p}_{mkr} X_{mkrl}^{(2)}  \right] \\
+	& \frac{\partial^2 \tilde{p}_{mjr}}{\partial \tilde{\beta}_a \partial \tilde{\beta}_{a'}} && = \tilde{p}_{mjr} \left[ \left( X_{mja}^{(1)} - \sum_{k} \tilde{p}_{mkr} X^{(1)}_{mka} \right) \left( X_{mja'}^{(1)} - \sum_{k} \tilde{p}_{mkr} X^{(1)}_{mka'} \right) \right.  \\
+	& && \left. + \left( \sum_k \tilde{p}_{mkr} X^{(1)}_{mka} \right) \left( \sum_k \tilde{p}_{mkr} X^{(1)}_{mka'} \right) - \sum_k \tilde{p}_{mkr} X_{mka}^{(1)} X_{mka'}^{(1)} \right] \\
+	& \frac{\partial^2 \tilde{p}_{mjr}}{\partial \tilde{\beta}_a \partial \sigma_l} && = \tilde{p}_{mjr} \left[ \left( X_{mja}^{(1)} - \sum_{k} \tilde{p}_{mkr} X^{(1)}_{mka} \right) \left( X_{mjrl}^{(2)} - \sum_{k} \tilde{p}_{mkr} X^{(2)}_{mkrl} \right) \right.  \\
+	& && \left. + \left( \sum_k \tilde{p}_{mkr} X^{(1)}_{mka} \right) \left( \sum_k \tilde{p}_{mkr} X^{(2)}_{mkrl} \right) - \sum_k \tilde{p}_{mkr} X_{mka}^{(1)} X_{mkrl}^{(2)} \right] \\
+	& \frac{\partial^2 \tilde{p}_{mjr}}{\partial \sigma_l \partial \sigma_{l'}} && = \tilde{p}_{mjr} \left[ \left( X_{mjrl}^{(2)} - \sum_{k} \tilde{p}_{mkr} X^{(2)}_{mkrl} \right) \left( X_{mjrl'}^{(2)} - \sum_{k} \tilde{p}_{mkr} X^{(2)}_{mkrl'} \right) \right.  \\
+	& && \left. + \left( \sum_k \tilde{p}_{mkr} X^{(2)}_{mkrl} \right) \left( \sum_k \tilde{p}_{mkr} X^{(2)}_{mkrl'} \right) - \sum_k \tilde{p}_{mkr} X_{mkrl}^{(2)} X_{mkrl'}^{(2)} \right] \\
+	& \frac{\partial p_{mj}}{\partial \tilde{\beta}_a} && =  p_{mj} X_{mja}^{(1)} - \sum_k X_{mka}^{(1)} \sum_r w_r \tilde{p}_{mjr} \tilde{p}_{mkr}  =  p_{mj} X_{mja}^{(1)} - \sum_r w_r \tilde{p}_{mjr} \sum_k \tilde{p}_{mkr} X_{mka}^{(1)} \\
+	& \frac{\partial p_{mj}}{\partial \sigma_l} && = \sum_r w_r \tilde{p}_{mjr} \left[ X_{mjrl}^{(2)} - \sum_k \tilde{p}_{mkr} X_{mkrl}^{(2)} \right] \\
+	& \frac{\partial^2 p_{mj}}{\partial \tilde{\beta}_a \partial \tilde{\beta}_{a'}} && = \sum_r w_r  \frac{\partial^2 \tilde{p}_{mjr}}{\partial \tilde{\beta}_a \partial \tilde{\beta}_{a'}}  \\
+	& \frac{\partial^2 p_{mj}}{\partial \tilde{\beta}_a \partial \sigma_l} && = \sum_r w_r  \frac{\partial^2 \tilde{p}_{mjr}}{\partial \tilde{\beta}_a \partial \sigma_l}  \\
+	& \frac{\partial^2 p_{mj}}{\partial \sigma_l \partial \sigma_{l'}} && = \sum_r w_r  \frac{\partial^2 \tilde{p}_{mjr}}{\partial \sigma_l \partial \sigma_{l'}} \\
+	& \frac{\partial \log(p_{mj})}{\partial \tilde{\beta}_a} && = X_{mja}^{(1)} - \sum_k X_{mka}^{(1)} \sum_r w_r \frac{\tilde{p}_{mjr} \tilde{p}_{mkr}}{p_{mj}} = X_{mja}^{(1)} - \sum_r w_r \frac{\tilde{p}_{mjr} }{p_{mj}} \sum_k \tilde{p}_{mkr} X_{mka}^{(1)}  \\
+	& \frac{\partial \log(p_{mj})}{\partial \sigma_l} && = \frac{1}{p_{mj}} \sum_r w_r \tilde{p}_{mjr} \left[ X_{mjrl}^{(2)} - \sum_k \tilde{p}_{mkr} X_{mkrl}^{(2)} \right] \\
+	& \frac{\partial^2 \log(p_{mj})}{\partial \tilde{\beta}_a \partial \tilde{\beta}_{a'}} && = - \frac{1}{p_{mj}^2} \times \frac{\partial p_{mj}}{\partial \beta_a} \times \frac{\partial p_{mj}}{\partial \beta_a'} + \frac{1}{p_{mj}} \times \frac{\partial^2 p_{mj}}{\partial \beta_a \partial \beta_{a'}}  \\
+	& \frac{\partial^2 \log(p_{mj})}{\partial \tilde{\beta}_a \partial \sigma_l} && = - \frac{1}{p_{mj}^2} \times \frac{\partial p_{mj}}{\partial \beta_a} \times \frac{\partial p_{mj}}{\partial \sigma_l} + \frac{1}{p_{mj}} \times \frac{\partial^2 p_{mj}}{\partial \beta_a \partial \sigma_l}  \\
+	& \frac{\partial^2 \log(p_{mj})}{\partial \sigma_l \partial \sigma_{l'}} && = - \frac{1}{p_{mj}^2} \times \frac{\partial p_{mj}}{\partial \sigma_l} \times \frac{\partial p_{mj}}{\partial \sigma_{l'}} + \frac{1}{p_{mj}} \times \frac{\partial^2 p_{mj}}{\partial \sigma_l \partial \sigma_{l'}}  \\
+\end{aligned}
+\end{equation}
+
+\paragraph{Useful notations: \\}
+\begin{equation}
+\small
+\begin{aligned}
+	& A^{(1)}_{mrl} && = \sum_k \tilde{p}_{mkr} X^{(1)}_{mkl} \\
+	& B^{(1)}_{mjrl} && = X^{(1)}_{mjl} - A^{(1)}_{mrl}  \\
+	& A^{(2)}_{mrl} && = \sum_k \tilde{p}_{mkr} X^{(2)}_{mkrl} \\
+	& B^{(2)}_{mjrl} && = X^{(2)}_{mjrl} - A^{(2)}_{mrl}  \\
 \end{aligned}
 \end{equation}
 
 
+\paragraph{Log-likelihood and derivatives: \\}
+\begin{equation}
+\small
+\begin{aligned}
+	& LL && = \sum_m \sum_{j} y_{mj} \log(p_{mj}) + C \hspace*{15pt}  \text{where } \hspace*{5pt} C =\sum_m \left[ \log(N_m!) - \sum_{j=0}^J \log(y_{mj}!) \right] \\
+	& \frac{\partial LL}{\partial \tilde{\beta}_a} && = \sum_m \sum_{j} y_{mj} \frac{\partial \log(p_{mj})}{\partial \tilde{\beta}_a} = \sum_m \sum_{j} y_{mj} \left[ X_{mja}^{(1)} - \frac{1}{p_{mj}} \sum_k X_{mka}^{(1)} \sum_r w_r \tilde{p}_{mjr} \tilde{p}_{mkr} \right] \\
+	& \frac{\partial LL}{\partial \sigma_l} && = \sum_m \sum_{j} y_{mj} \frac{\partial \log(p_{mj})}{\partial \sigma_l} = \sum_m \sum_{j} \frac{y_{mj}}{p_{mj}} \sum_r w_r \tilde{p}_{mjr} \left[ X_{mjrl}^{(2)} - \sum_k \tilde{p}_{mkr} X_{mkrl}^{(2)} \right] \\
+	& \frac{\partial^2 LL}{\partial \tilde{\beta}_a \partial \tilde{\beta}_{a'}} && = \sum_m \sum_{j} y_{mj} \frac{\partial^2 \log(p_{mj})}{\partial \beta_a \partial \beta_{a'}} \\
+	& && = \sum_m \sum_j \frac{y_{mj}}{p_{mj}} \left[ \frac{-1}{p_{mj}} \left( \sum_r w_r \tilde{p}_{mjr} B^{(1)}_{mjra} \right) \left( \sum_r w_r \tilde{p}_{mjr} B^{(1)}_{mjra'} \right) \right. \\
+	& && \left. + \sum_r w_r \tilde{p}_{mjr} \left( B^{(1)}_{mjra} B^{(1)}_{mjra'} + A_{mra} A_{mra'} - \sum_k \tilde{p}_{mkr} X^{(1)}_{mkra} X^{(1)}_{mkra'} \right) \right] \\
+	& \frac{\partial^2 LL}{\partial \tilde{\beta}_a \partial \sigma_l} && = \sum_m \sum_{j} y_{mj} \frac{\partial^2 \log(p_{mj})}{\partial \tilde{\beta}_a \partial \sigma_l} = \sum_m \sum_{j} y_{mj} \frac{\partial^2 \log(p_{mj})}{\partial \beta_a \partial \sigma_{l}} \\
+	& && = \sum_m \sum_j \frac{y_{mj}}{p_{mj}} \left[ \frac{-1}{p_{mj}} \left( \sum_r w_r \tilde{p}_{mjr} B^{(1)}_{mjra} \right) \left( \sum_r w_r \tilde{p}_{mjr} B^{(2)}_{mjrl} \right) \right. \\
+	& && \left. + \sum_r w_r \tilde{p}_{mjr} \left( B^{(1)}_{mjra} B^{(2)}_{mjrl} + A^{(1)}_{mra} A^{(2)}_{mrl} - \sum_k \tilde{p}_{mkr} X^{(1)}_{mka} X^{(2)}_{mkrl} \right) \right] \\
+	& \frac{\partial^2 LL}{\partial \sigma_l \partial \sigma_{l'}} && = \sum_m \sum_{j} y_{mj} \frac{\partial^2 \log(p_{mj})}{\partial \sigma_l \partial \sigma_{l'}} \\
+	& && = \sum_m \sum_j \frac{y_{mj}}{p_{mj}} \left[ \frac{-1}{p_{mj}} \left( \sum_r w_r \tilde{p}_{mjr} B^{(2)}_{mjrl} \right) \left( \sum_r w_r \tilde{p}_{mjr} B^{(2)}_{mjrl'} \right) \right. \\
+	& && \left. + \sum_r w_r \tilde{p}_{mjr} \left( B^{(2)}_{mjrl} B^{(2)}_{mjrl'} + A_{mrl} A_{mrl'} - \sum_k \tilde{p}_{mkr} X^{(2)}_{mkrl} X^{(2)}_{mkrl'} \right) \right] \\
+\end{aligned}
+\end{equation}
+
+
+\paragraph{Fisher information matrix: \\}
+In expectation, the second-degree derivatives simpify:
+\begin{equation}
+\begin{aligned}
+	& \mathbb{E}\left[ \frac{\partial^2 LL}{\partial \beta_a \partial \beta_{a'}} \right] && = - \sum_m \sum_j N_m p_{mj} M^{(1)}_{mja} M^{(1)}_{mja'} \\
+	& \mathbb{E}\left[ \frac{\partial^2 LL}{\partial \beta_a \partial \sigma_{l}} \right] && = - \sum_m \sum_j N_m p_{mj} M^{(1)}_{mja} M^{(2)}_{mjl} \\
+	& \mathbb{E}\left[ \frac{\partial^2 LL}{\partial \sigma_l \partial \sigma_{l'}} \right] && = - \sum_m \sum_j N_m p_{mj} M^{(2)}_{mjl} M^{(2)}_{mjl'} \\
+\text{where }  & M^{(1)}_{mja} && = \sum_r \frac{w_r \tilde{p}_{mjr}}{p_{mj}} B^{(1)}_{mjra} \\
+\text{where }  & M^{(2)}_{mjl} && = \sum_r \frac{w_r \tilde{p}_{mjr}}{p_{mj}} B^{(2)}_{mjrl} \\
+\end{aligned}
+\end{equation}
 
 
 \end{document}
