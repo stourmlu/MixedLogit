@@ -188,8 +188,8 @@ In expectation, the second-degree derivatives simpify:
 	& \mathbb{E}\left[ \frac{\partial^2 LL}{\partial \beta_a \partial \beta_{a'}} \right] && = - \sum_m \sum_j N_m p_{mj} M^{(1)}_{mja} M^{(1)}_{mja'} \\
 	& \mathbb{E}\left[ \frac{\partial^2 LL}{\partial \beta_a \partial \sigma_{l}} \right] && = - \sum_m \sum_j N_m p_{mj} M^{(1)}_{mja} M^{(2)}_{mjl} \\
 	& \mathbb{E}\left[ \frac{\partial^2 LL}{\partial \sigma_l \partial \sigma_{l'}} \right] && = - \sum_m \sum_j N_m p_{mj} M^{(2)}_{mjl} M^{(2)}_{mjl'} \\
-\text{where }  & M^{(1)}_{mja} && = \sum_r \frac{w_r \tilde{p}_{mjr}}{p_{mj}} B^{(1)}_{mjra} \\
-\text{where }  & M^{(2)}_{mjl} && = \sum_r \frac{w_r \tilde{p}_{mjr}}{p_{mj}} B^{(2)}_{mjrl} \\
+\text{where }  & M^{(1)}_{mja} && = \sum_r \frac{w_r \tilde{p}_{mjr}}{p_{mj}} B^{(1)}_{mjra} = \frac{\partial \log(p_{mj})}{\partial \beta_a}   \\
+\text{where }  & M^{(2)}_{mjl} && = \sum_r \frac{w_r \tilde{p}_{mjr}}{p_{mj}} B^{(2)}_{mjrl} = \frac{\partial \log(p_{mj})}{\partial \sigma_l}   \\
 \end{aligned}
 \end{equation}
 
