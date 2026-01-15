@@ -19,8 +19,8 @@ function [LL, varargout] = loglikelihood_MMNL(Y, Xhomo, Xhetero, weights, M, M_r
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%%%%% Outputs:
 	% LL:            		scalar
-	% grad:					L x 1
-	% hessian:				L x L
+	% grad:					(NumXhomo + NumXhetero) x 1
+	% FisherInfo:			(NumXhomo + NumXhetero) x (NumXhomo + NumXhetero)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
 	%%% Read dimensions
@@ -86,10 +86,20 @@ function [LL, varargout] = loglikelihood_MMNL(Y, Xhomo, Xhetero, weights, M, M_r
 	varargout{1} = grad;
 	if nargout <= 2; return; end;
 	
-	%%% Compute Hessian
-	error('Need to compute hess');
-	if returnNegative
-		hess = - hess;
+	%%% Compute Fisher Information matrix
+	FisherInfo = zeros(NumXhomo + NumXhetero, NumXhomo + NumXhetero);
+	d2_LL_d2beta = d_logp_dbeta'*((M_rep.*p).*d_logp_dbeta);        % NumXhomo x NumXhomo
+	d2_LL_dsigma_dbeta = d_logp_dsigma'*((M_rep.*p).*d_logp_dbeta); % NumXhetero x NumXhomo
+	d2_LL_d2sigma = d_logp_dsigma'*(M_rep.*d_logp_dsigma);      % NumXhetero x NumXhetero
+	idxes_homo = 1:NumXhomo;
+	idxes_hetero = NumXhomo+1:NumXhomo+NumXhetero;
+	FisherInfo(idxes_homo, idxes_homo) = d2_LL_d2beta;
+	FisherInfo(idxes_hetero, idxes_homo) = d2_LL_dsigma_dbeta;
+	FisherInfo(idxes_homo, idxes_hetero) = d2_LL_dsigma_dbeta';
+	FisherInfo(idxes_hetero, idxes_hetero) = d2_LL_d2sigma;
+	
+	if ~returnNegative
+		FisherInfo = - FisherInfo;
 	end
-	varargout{2} = hess;
+	varargout{2} = FisherInfo;
 end

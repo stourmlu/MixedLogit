@@ -2,10 +2,10 @@ addpath('../../../Optimization/Matlab');
 
 NumX = 8; % number of characteristics (width of X)
 NumMarkets =2500;
-J = 40;
+J = 20;
 
 X = normrnd(0,1,[J*NumMarkets NumX]);
-M = 10000*ones(NumMarkets, 1);
+M = 100*ones(NumMarkets, 1);
 
 % Heterogeneity part
 idxes_heterog_coefs = [8]; % indexes of characteristics that have heterogenous coefficients
@@ -73,5 +73,5 @@ end
 %%% Estimate model
 [params_star, LL_star, LL_grad, FisherInfo, params_ses] = estimate_MMNL(M, X, Y, jm_2_mm_vec, idxes_heterog_coefs, nu, weights);
 
-disp([params_true params_star]);
+disp([params_true params_star params_ses]);
 %disp(table(params_true, params_star, params_ses));

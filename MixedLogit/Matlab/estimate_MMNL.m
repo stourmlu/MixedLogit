@@ -67,7 +67,9 @@ function [beta_star, LL_star, LL_grad, FisherInfo, beta_ses] = estimate_MMNL(M, 
 	FisherInfo = [];
 	beta_ses = [];
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	params0 = beta_star;
 %	[beta_star, LL_star, LL_grad, FisherInfo] = Newton_Raphson(obj, params0, 1e-6, 2000);
-%	beta_ses = sqrt(diag(inv(FisherInfo)));
+	[~,~,FisherInfo] = obj(beta_star);
+	beta_ses = sqrt(diag(inv(FisherInfo)));
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 end
