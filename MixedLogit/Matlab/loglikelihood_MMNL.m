@@ -90,14 +90,14 @@ function [LL, varargout] = loglikelihood_MMNL(Y, Xhomo, Xhetero, weights, M, M_r
 	EY_vec = M_rep.*p;	% Method 1: keep E[Y_mj] = N_m * p_mj
 %	EY_vec = Y;			% Method 2: replace E[Y_mj] by Y_mj
 	FisherInfo = zeros(NumXhomo + NumXhetero, NumXhomo + NumXhetero);
-	d2_LL_d2beta = d_logp_dbeta'*(EY_vec.*d_logp_dbeta);        % NumXhomo x NumXhomo
-	d2_LL_dsigma_dbeta = d_logp_dsigma'*(EY_vec.*d_logp_dbeta); % NumXhetero x NumXhomo
-	d2_LL_d2sigma = d_logp_dsigma'*(EY_vec.*d_logp_dsigma);      % NumXhetero x NumXhetero
-	idxes_homo = 1:NumXhomo;
+	d2_LL_d2beta       = d_logp_dbeta' *(EY_vec.*d_logp_dbeta);  % NumXhomo x NumXhomo
+	d2_LL_dsigma_dbeta = d_logp_dsigma'*(EY_vec.*d_logp_dbeta);  % NumXhetero x NumXhomo
+	d2_LL_d2sigma      = d_logp_dsigma'*(EY_vec.*d_logp_dsigma); % NumXhetero x NumXhetero
+	idxes_homo   = 1:NumXhomo;
 	idxes_hetero = NumXhomo+1:NumXhomo+NumXhetero;
-	FisherInfo(idxes_homo, idxes_homo) = d2_LL_d2beta;
-	FisherInfo(idxes_hetero, idxes_homo) = d2_LL_dsigma_dbeta;
-	FisherInfo(idxes_homo, idxes_hetero) = d2_LL_dsigma_dbeta';
+	FisherInfo(idxes_homo, idxes_homo)     = d2_LL_d2beta;
+	FisherInfo(idxes_hetero, idxes_homo)   = d2_LL_dsigma_dbeta;
+	FisherInfo(idxes_homo, idxes_hetero)   = d2_LL_dsigma_dbeta';
 	FisherInfo(idxes_hetero, idxes_hetero) = d2_LL_d2sigma;
 %	%%%%%%%%%%
 %	% Different way of computing FisherInfo that is equivalent
