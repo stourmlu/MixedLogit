@@ -8,7 +8,7 @@ X = normrnd(0,1,[J*NumMarkets NumX]);
 M = 100*ones(NumMarkets, 1);
 
 % Heterogeneity part
-idxes_heterog_coefs = [8]; % indexes of characteristics that have heterogenous coefficients
+idxes_heterog_coefs = [7 8]; % indexes of characteristics that have heterogenous coefficients
 NumXhetero = length(idxes_heterog_coefs);
 %%%%% Using MC integration
 NumDraws = 100;
@@ -73,5 +73,4 @@ end
 %%% Estimate model
 [params_star, LL_star, LL_grad, FisherInfo, params_ses] = estimate_MMNL(M, X, Y, jm_2_mm_vec, idxes_heterog_coefs, nu, weights);
 
-disp([params_true params_star params_ses]);
-%disp(table(params_true, params_star, params_ses));
+disp(table(params_true, params_star, params_ses));

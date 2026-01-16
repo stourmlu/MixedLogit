@@ -49,27 +49,23 @@ function [beta_star, LL_star, LL_grad, FisherInfo, beta_ses] = estimate_MMNL(M, 
 	LL_constant = sum(gammaln(M+1)) - sum(gammaln(Y+1));
 	obj = @(params_val) loglikelihood_MMNL(Y, Xhomo, Xhetero, weights, M, M_rep, jmd_2_md_vec, jmd_2_jm_vec, params_val, LL_constant, true);
 	
-	
 	% Define stating point function
-%	params0 = zeros(NumXhomo + NumXhetero, 1);
 	params0 = normrnd(0,1,[NumXhomo + NumXhetero, 1]);
 	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%for ii = 1:4
-%	[beta_star, LL_star] = NelderMead(obj, params0);
-%	LL_grad = [];
-%	FisherInfo = [];
-%	beta_ses = [];
-%params0 = beta_star;
-%end
+	%%% Nelder-Mead method
+	%for ii = 1:4
+	%	[beta_star, LL_star] = NelderMead(obj, params0);
+	%	LL_grad = [];
+	%	FisherInfo = [];
+	%	beta_ses = [];
+	%params0 = beta_star;
+	%end
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	[beta_star, LL_star, LL_grad] = BFGS(obj, params0, 1e-6, 2000, true);
-	FisherInfo = [];
-	beta_ses = [];
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%	params0 = beta_star;
-%	[beta_star, LL_star, LL_grad, FisherInfo] = Newton_Raphson(obj, params0, 1e-6, 2000);
+	%%% BFGS method
+	[beta_star, LL_star, LL_grad] = BFGS(obj, params0, 1e-8, 2000, true);
 	[~,~,FisherInfo] = obj(beta_star);
+	FisherInfo = -FisherInfo;
 	beta_ses = sqrt(diag(inv(FisherInfo)));
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 end
