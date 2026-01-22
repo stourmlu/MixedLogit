@@ -1,4 +1,4 @@
-function [beta_star, LL_star, LL_grad, FisherInfo, beta_ses] = estimate_MMNL(M, X, Y, jm_2_mm_vec, idxes_heterog_coefs, varargin)
+function [beta_star, LL_star, LL_grad, FisherInfo, beta_ses] = estimate_MMNL(M, X, Y, jm_2_mm_vec, idxes_heterog_coefs)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% This function estimates a multinomial logit model by maximum likelihood, using the Newton-Raphson algorithm.
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -7,6 +7,7 @@ function [beta_star, LL_star, LL_grad, FisherInfo, beta_ses] = estimate_MMNL(M, 
 	% X:					Num_jm x NumX  (covariates corresponding to each option, across all choice sets)
 	% Y:					Num_jm x 1     (number of "successful tries" for that option in that choice set, across the M_n tries)
 	% jm_2_mm_vec:			Num_jm x 1     (maps each option to the choice set it belongs to, values between 1 and NumMarkets)
+	% idxes_heterog_coefs:	1 x NumXhetero (integers between 1 and NumX indicating which X variables should have a heterogeneous coefficient)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%%%%% Outputs:
 	% beta_star:           	NumX x 1
@@ -16,16 +17,19 @@ function [beta_star, LL_star, LL_grad, FisherInfo, beta_ses] = estimate_MMNL(M, 
 	% beta_ses:				NumX x 1
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
-	if length(varargin) >=1;
-		nu      = varargin{1};
-		weights = varargin{2};
-	else
-		error('Need draw nu and weights'); % TO DO
-	end
-	
 	% Read dimensions
 	[Num_jm,NumXhomo] = size(X);
 	NumXhetero = length(idxes_heterog_coefs);
+	
+	%%% Make nodes and weights for numerical integration
+	%%%% Gauss-Hermite quadrature
+	NumNodesPerDim = 20;
+	[nu, weights] = GaussHermite_4_standard_MVN(NumXhetero, NumNodesPerDim);
+	%%%% Monte-Carlo integration
+	%NumDraws = 100;
+	%nu = normrnd(0,1,[NumDraws NumXhetero]); % NumDraws x NumXhetero
+	%weights = 1/NumDraws * ones(NumDraws, 1); % NumDraws x 1
+	%%%%
 	NumDraws = size(weights,1);
 	
 	% From jm_2_mm_vec and NumDraws (given), construct jmd_2_md_vec
