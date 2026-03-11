@@ -93,6 +93,13 @@ end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% ESTIMATE MODEL %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-[params_star, LL_star, LL_grad, FisherInfo, params_ses] = estimate_MMNL(M, X, Y, jm_2_mm_vec, idxes_heterog_coefs);
+% Define method and details for numerical integration
+numinteg.method = 'GaussHermite';
+numinteg.NumNodesPerDim = 20;
+%numinteg.method = 'MonteCarlo';
+%numinteg.NumDraws = 100;
+
+% Launch estimation
+[params_star, LL_star, LL_grad, FisherInfo, params_ses] = estimate_MMNL(M, X, Y, jm_2_mm_vec, idxes_heterog_coefs, numinteg);
 
 disp(table(params_true, params_star, params_ses));

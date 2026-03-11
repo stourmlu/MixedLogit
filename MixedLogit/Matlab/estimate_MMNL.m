@@ -1,4 +1,4 @@
-function [beta_star, LL_star, LL_grad, FisherInfo, beta_ses] = estimate_MMNL(M, X, Y, jm_2_mm_vec, idxes_heterog_coefs)
+function [beta_star, LL_star, LL_grad, FisherInfo, beta_ses] = estimate_MMNL(M, X, Y, jm_2_mm_vec, idxes_heterog_coefs, numinteg)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% This function estimates a multinomial logit model by maximum likelihood, using the Newton-Raphson algorithm.
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -22,14 +22,16 @@ function [beta_star, LL_star, LL_grad, FisherInfo, beta_ses] = estimate_MMNL(M, 
 	NumXhetero = length(idxes_heterog_coefs);
 	
 	%%% Make nodes and weights for numerical integration
-	%%%% Gauss-Hermite quadrature
-	NumNodesPerDim = 20;
-	[nu, weights] = GaussHermite_4_standard_MVN(NumXhetero, NumNodesPerDim);
-	%%%% Monte-Carlo integration
-	%NumDraws = 100;
-	%nu = normrnd(0,1,[NumDraws NumXhetero]); % NumDraws x NumXhetero
-	%weights = 1/NumDraws * ones(NumDraws, 1); % NumDraws x 1
-	%%%%
+	if strcmp(numinteg.method, 'GaussHermite')
+		NumNodesPerDim = numinteg.NumNodesPerDim;
+		[nu, weights] = GaussHermite_4_standard_MVN(NumXhetero, NumNodesPerDim);
+	else if strcmp(numinteg.method, 'MonteCarlo')
+		NumDraws = numinteg.NumDraws;
+		nu = normrnd(0,1,[NumDraws NumXhetero]); % NumDraws x NumXhetero
+		weights = 1/NumDraws * ones(NumDraws, 1); % NumDraws x 1
+	else
+		error('Unknown method for numerical integration.');
+	end; end;
 	NumDraws = size(weights,1);
 	
 	% From jm_2_mm_vec and NumDraws (given), construct jmd_2_md_vec
